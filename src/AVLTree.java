@@ -5,91 +5,48 @@ public class AVLTree {
         this.root = null;
     }
 
-    private class Node {
-        int value;
-        Node left, right;
-        int height;
-
-        Node(int value) {
-            this.value = value;
-            this.height = 1;
-        }
-    }
-
     private int height(Node node) {
-        return (node == null) ? 0 : node.height;
+        return (node == null) ? 0 : node.getHeight();
     }
 
     private int getBalance(Node node) {
-        return (node == null) ? 0 : height(node.left) - height(node.right);
+        return (node == null) ? 0 : height(node.getLeft()) - height(node.getRight());
     }
 
     public void insert(int value) {
-        System.out.println("Nodo a insertar: " + value);
+        System.out.println("valor a insertar: " + value);
         root = insertRec(root, value);
     }
 
     private Node insertRec(Node node, int value) {
         if (node == null) {
-            return new Node(value);
+            Node newNode = new Node(value);
+            newNode.setHeight(1);
+            System.out.println("nodo insertado: " + newNode.getValue());
+            System.out.println("balance al insertar: " + getBalance(newNode));
+            return newNode;
         }
 
-        if (value < node.value) {
-            node.left = insertRec(node.left, value);
-        } else if (value > node.value) {
-            node.right = insertRec(node.right, value);
+        if (value < node.getValue()) {
+            node.setLeft(insertRec(node.getLeft(), value));
+        } else if (value > node.getValue()) {
+            node.setRight(insertRec(node.getRight(), value));
         } else {
             return node;
         }
 
-        node.height = 1 + Math.max(height(node.left), height(node.right));
+        int altura = 1 + Math.max(height(node.getLeft()), height(node.getRight()));
+        node.setHeight(altura);
 
         int balance = getBalance(node);
+        System.out.println("nodo actual: " + node.getValue() + " - altura: " + node.getHeight() + " - balance: " + balance);
 
-        if (balance > 1 && value < node.left.value) {
-            return rotateRight(node);
-        }
-
-        if (balance < -1 && value > node.right.value) {
-            return rotateLeft(node);
-        }
-
-        if (balance > 1 && value > node.left.value) {
-            node.left = rotateLeft(node.left);
-            return rotateRight(node);
-        }
-
-        if (balance < -1 && value < node.right.value) {
-            node.right = rotateRight(node.right);
-            return rotateLeft(node);
+        if (balance == -2) {
+            System.out.println("cambio rotacion izquierda");
+        } else if (balance == 2) {
+            System.out.println("cambio rotacion derecha");
         }
 
         return node;
-    }
-
-    private Node rotateRight(Node y) {
-        Node x = y.left;
-        Node T2 = x.right;
-
-        x.right = y;
-        y.left = T2;
-
-        y.height = 1 + Math.max(height(y.left), height(y.right));
-        x.height = 1 + Math.max(height(x.left), height(x.right));
-
-        return x;
-    }
-
-    private Node rotateLeft(Node x) {
-        Node y = x.right;
-        Node T2 = y.left;
-
-        y.left = x;
-        x.right = T2;
-
-        x.height = 1 + Math.max(height(x.left), height(x.right));
-        y.height = 1 + Math.max(height(y.left), height(y.right));
-
-        return y;
     }
 }
